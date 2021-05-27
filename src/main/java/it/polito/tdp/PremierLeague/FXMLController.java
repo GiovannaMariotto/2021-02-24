@@ -78,7 +78,38 @@ public class FXMLController {
     
     @FXML
     void doSimula(ActionEvent event) {
-
+    	this.txtResult.clear();
+    	Integer nAzioni = null;
+    	Match m = this.cmbMatch.getValue();
+    	
+    try {
+    		
+    		nAzioni = Integer.parseInt(this.txtN.getText());
+    		
+    		
+    	}catch(NumberFormatException e) {
+    		e.printStackTrace();
+    		this.txtResult.appendText("ERRORE: Inserire un numero di azioni(intero) prima di simulare!");
+    		return;
+    	}
+    	
+    	if(nAzioni==null) {
+    		this.txtResult.appendText("ERRORE: Inserire un numero di azioni(intero) prima di simulare!");
+    		return;
+    	}
+    	
+    	if(this.model.getGrafo() == null || m==null) {
+    		this.txtResult.setText("Crea prima il grafo!");
+    		return ;
+    	}
+    	
+    	
+    	this.txtResult.appendText("SIMULAZIONE:"+"\n");
+    	this.model.Simula(nAzioni, m, model); //Integer,Match
+    	String result = this.model.getSimulationResult();
+    	this.txtResult.appendText(result);
+    	
+    	
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete

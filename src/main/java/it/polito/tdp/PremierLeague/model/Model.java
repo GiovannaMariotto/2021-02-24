@@ -1,10 +1,13 @@
 package it.polito.tdp.PremierLeague.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
@@ -20,18 +23,28 @@ public class Model {
 	PremierLeagueDAO dao;
 	private Graph<Player, DefaultWeightedEdge> grafo;
 	private Map<Integer,Player> idMap;
+	private Simulatore sim;
+	private Map<Integer,Action> azioni; //playedID and Action
+	private List<Match> matches;
+	private Match match;
 	
 	public Model() {
 		this.dao=new PremierLeagueDAO();
 		this.idMap= new HashMap<Integer, Player>();
 		this.dao.listAllPlayers(idMap);
 		
+		
 	}
-	
+	public Match getMatch() {
+		return match;
+	}
+	public void setMatch(Match m) {
+		this.match=m;
+	}
 	
 	public void creaGrafo(Match m) {
 		grafo= new SimpleDirectedWeightedGraph<>(DefaultWeightedEdge.class);
-		
+		this.match=m;
 		
 		//aggiungere i vertici
 		Graphs.addAllVertices(this.grafo, this.dao.getVertici(m,idMap));
@@ -110,4 +123,49 @@ public class Model {
 	public Graph getGrafo() {
 		return this.grafo;
 	}
+	
+	public void Simula(Integer n, Match m, Model model) {
+		//inizializazzione 
+		sim = new Simulatore();
+		sim.setModel(model);
+		this.match=m;
+		azioni=getMapaAzioni(m);
+		sim.setAzioni(azioni);
+		
+		sim.init(n,m); // mettere i parametri di input
+		sim.run();
+	
+	}
+	public Map<Integer,Action> getMapaAzioni(Match m){
+		List<Action> listaAzioni = new LinkedList<Action>(this.dao.listAllActionsOfMatch(m));
+		azioni= new HashMap<Integer,Action>();
+		for(Action a2 : listaAzioni) {
+			if(a2!=null && !(a2.getPlayerID()==null)) {
+				azioni.put(a2.playerID , a2);
+			}else {
+				System.out.println("ERRORE: azione null");
+			}
+		}
+		if(azioni==null) {
+			System.out.println("ERRORE: mapa azioni null");
+			return null;
+		}
+		
+		return azioni;
+	}
+
+	
+	public String getSimulationResult() {
+		if(sim!=null) {
+			String result = sim.getGols()+"\n"+sim.getEspulsioni();
+			return result;
+		}
+		
+		return null;
+	}
+	
+	public void setSimModel(Model m) {
+		this.sim.setModel(m);
+	}
+	
 }

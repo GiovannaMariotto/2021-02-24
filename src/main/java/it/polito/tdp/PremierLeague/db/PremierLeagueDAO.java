@@ -64,13 +64,16 @@ public class PremierLeagueDAO {
 		}
 	}
 	
-	public List<Action> listAllActions(){
-		String sql = "SELECT * FROM Actions";
+	public List<Action> listAllActionsOfMatch(Match m){
+		String sql = "SELECT * "
+				+ "FROM actions a "
+				+ "WHERE a.MatchID=? ";
 		List<Action> result = new ArrayList<Action>();
 		Connection conn = DBConnect.getConnection();
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, m.getMatchID());
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
 				
@@ -170,5 +173,13 @@ public class PremierLeagueDAO {
 		}
 		
 	}
+
 	
+	
+
+	
+
 }
+
+
+	
